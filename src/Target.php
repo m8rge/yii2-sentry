@@ -57,6 +57,13 @@ class Target extends \yii\log\Target
             ];
 
             if ($context instanceof \Throwable || $context instanceof \Exception) {
+                $reflection = new \ReflectionClass($context);
+                foreach ($reflection->getProperties() as $property) {
+                    if ($property->isPublic()) {
+                        $data['extra'][$property->name] = $property->getValue($context);
+                    }
+                }
+
                 $this->sentry->captureException($context, $data);
                 continue;
             } elseif (isset($context['msg'])) {
