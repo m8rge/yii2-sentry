@@ -57,13 +57,7 @@ class Target extends \yii\log\Target
             ];
 
             if ($context instanceof \Throwable || $context instanceof \Exception) {
-                $reflection = new \ReflectionClass($context);
-                foreach ($reflection->getProperties() as $property) {
-                    if ($property->isPublic()) {
-                        $data['extra'][$property->name] = $property->getValue($context);
-                    }
-                }
-
+                $data['extra'] = $this->extractExtraFields($context);
                 $this->sentry->captureException($context, $data);
                 continue;
             } elseif (isset($context['msg'])) {
@@ -84,6 +78,22 @@ class Target extends \yii\log\Target
 
             $this->sentry->capture($data, $traces);
         }
+    }
+
+    public function extractExtraFields(\Throwable $e): array
+    {
+        $fields = [];
+
+        $reflection = new \ReflectionClass($e);
+        foreach ($reflection->getProperties() as $property) {
+            if ($property->isPublic()) {
+                $fields[$property->name] = $property->getValue($e);
+            }
+        }
+
+        $previous = $e->getPrevious();
+
+        return $previous ? $fields + $this->extractExtraFields($previous) : $fields;
     }
 
     /**
