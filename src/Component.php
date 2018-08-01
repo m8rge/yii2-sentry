@@ -137,16 +137,25 @@ class Component extends \yii\base\Component
 
     public function captureMessage($message, $params, $levelOrOptions = [], $stack = false, $vars = null)
     {
+        if (!$this->enabled) {
+            return false;
+        }
         return $this->client->captureMessage($message, $params, $levelOrOptions, $stack, $vars);
     }
 
     public function captureException($exception, $culpritOrOptions = null, $logger = null, $vars = null)
     {
+        if (!$this->enabled) {
+            return false;
+        }
         return $this->client->captureException($exception, $culpritOrOptions, $logger, $vars);
     }
 
     public function capture($data, $stack = null, $vars = null)
     {
+        if (!$this->enabled) {
+            return false;
+        }
         return $this->client->capture($data, $stack, $vars);
     }
 
