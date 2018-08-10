@@ -56,7 +56,7 @@ class Target extends \yii\log\Target
                 ],
             ];
 
-            if ($context instanceof \Throwable || $context instanceof \Exception) {
+            if ($context instanceof \Exception) {
                 $data['extra'] = $this->extractExtraFields($context);
                 $this->sentry->captureException($context, $data);
                 continue;
@@ -80,7 +80,7 @@ class Target extends \yii\log\Target
         }
     }
 
-    public function extractExtraFields(\Throwable $e): array
+    public function extractExtraFields(\Exception $e)
     {
         $fields = [];
 
